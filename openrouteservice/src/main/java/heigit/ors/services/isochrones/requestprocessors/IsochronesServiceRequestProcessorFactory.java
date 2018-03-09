@@ -48,8 +48,17 @@ public class IsochronesServiceRequestProcessorFactory {
 		if (Helper.isEmpty(formatParam))
 			formatParam = "json";
 
-		if (formatParam.equalsIgnoreCase("json"))
-			return new JsonIsochronesRequestProcessor(request);
+		switch (formatParam)
+		{
+			case "json":
+			case "geojson":
+				return new JsonIsochronesRequestProcessor(request);
+			default:
+				throw new UnknownParameterValueException(IsochronesErrorCodes.INVALID_PARAMETER_VALUE, "format", formatParam);
+		}
+
+		/*if (formatParam.equalsIgnoreCase("json"))
+			return new JsonIsochronesRequestProcessor(request);*/
 		/*else if (formatParam.equalsIgnoreCase("xml"))
 			return new XmlAccessibilityRequestProcessor(request);*/
 		else 
