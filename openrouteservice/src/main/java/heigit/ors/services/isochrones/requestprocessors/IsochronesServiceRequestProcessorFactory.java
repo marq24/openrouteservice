@@ -22,6 +22,7 @@ package heigit.ors.services.isochrones.requestprocessors;
 
 import javax.servlet.http.HttpServletRequest;
 
+import heigit.ors.services.routing.requestprocessors.TmcInformationRequestProcessor;
 import heigit.ors.servlet.http.AbstractHttpRequestProcessor;
 import heigit.ors.common.StatusCode;
 import heigit.ors.exceptions.StatusCodeException;
@@ -43,16 +44,40 @@ public class IsochronesServiceRequestProcessorFactory {
 		if (!RoutingProfileManagerStatus.isReady())
 			throw new StatusCodeException(StatusCode.SERVICE_UNAVAILABLE, IsochronesErrorCodes.UNKNOWN, "Isochrones service is not ready yet.");
 
-		String formatParam = request.getParameter("format");
+		String requestParam = request.getParameter("request");
+		if (Helper.isEmpty(requestParam))
+			requestParam ="isochrone";
 
-		if (Helper.isEmpty(formatParam))
-			formatParam = "json";
+		switch (requestParam.toLowerCase())
+		{
+			case "tmc":
+				return new TmcInformationRequestProcessor(request);
+			case "isochone":
+				String formatParam = request.getParameter("format");
+				if (Helper.isEmpty(formatParam))
+					formatParam = "json";
+				else
+					formatParam = formatParam.toLowerCase();
 
-		if (formatParam.equalsIgnoreCase("json"))
-			return new JsonIsochronesRequestProcessor(request);
+				switch (formatParam)
+				{
+					case "json":
+					case "geojson":
+						return new JsonIsochronesRequestProcessor(request);
+					default:
+						throw new UnknownParameterValueException(IsochronesErrorCodes.INVALID_PARAMETER_VALUE, "format", formatParam);
+				}
+			default:
+				throw new UnknownParameterValueException(IsochronesErrorCodes.INVALID_PARAMETER_VALUE, "request", requestParam);
+		}
+
+
+
+		/*if (formatParam.equalsIgnoreCase("json"))
+			return new JsonIsochronesRequestProcessor(request);*/
 		/*else if (formatParam.equalsIgnoreCase("xml"))
 			return new XmlAccessibilityRequestProcessor(request);*/
-		else 
-			throw new UnknownParameterValueException(IsochronesErrorCodes.INVALID_PARAMETER_VALUE, "format", formatParam);
+		/*else
+			throw new UnknownParameterValueException(IsochronesErrorCodes.INVALID_PARAMETER_VALUE, "format", formatParam);*/
 	}
 }
