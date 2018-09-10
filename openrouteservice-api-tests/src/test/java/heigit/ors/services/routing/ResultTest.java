@@ -1042,7 +1042,7 @@ http://localhost:8080/ors/routes?
 				.assertThat()
 				.body("any { it.key == 'routes' }", is(true))
 				.body("routes[0].summary.distance", is(809.3f))
-				.body("routes[0].summary.duration", is(225.1f))
+				.body("routes[0].summary.duration", is(215.8f))
 				.statusCode(200);
 
 		given()
@@ -1058,7 +1058,7 @@ http://localhost:8080/ors/routes?
 				.assertThat()
 				.body("any { it.key == 'routes' }", is(true))
 				.body("routes[0].summary.distance", is(379.5f))
-				.body("routes[0].summary.duration", is(135.7f))
+				.body("routes[0].summary.duration", is(135.5f))
 				.statusCode(200);
 	}
 

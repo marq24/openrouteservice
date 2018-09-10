@@ -370,15 +370,26 @@ public class CarFlagEncoder extends ORSAbstractFlagEncoder {
 
             speed = getSurfaceSpeed(way, speed);
 
+            /*removed by MARQ24 - to reduce the speed based on the length of the way and
+            the acceleration of the vehicle makes IMHO no sense at all - since this would
+            mean, that at every junction of the OSM data we will make a FULL-STOP and
+            start to accelerate again...*/
             if(way.hasTag("estimated_distance")) {
                 double estDist = way.getTag("estimated_distance", Double.MAX_VALUE);
+                //double orgSpeed = speed;
                 speed = Math.max(adjustSpeedForAcceleration(estDist, speed), speedFactor);
+                //System.out.println("estimated_distance '" +estDist+"' - "+((int)((speed/orgSpeed)*100))+"%");
             }
 
-            boolean isRoundabout = way.hasTag("junction", "roundabout");
+            /*if(way.hasTag("traffic_light_count")){
+                int tCount = way.getTag("traffic_light_count", Integer.MAX_VALUE);
+                if(tCount < Integer.MAX_VALUE){
+                    //double orgSpeed = speed;
+                    speed = speed / (tCount*2);
+            }*/
 
-            if (isRoundabout) // Runge
-            {
+            boolean isRoundabout = way.hasTag("junction", "roundabout") || way.hasTag("junction", "circular");
+            if (isRoundabout){ // Runge
             	//http://www.sidrasolutions.com/Documents/OArndt_Speed%20Control%20at%20Roundabouts_23rdARRBConf.pdf
             	if (way.hasTag("highway", "mini_roundabout"))
             		speed = speed < 25 ? speed : 25;
